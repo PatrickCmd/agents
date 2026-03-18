@@ -1,0 +1,74 @@
+{
+  "city_profile": {
+    "population": 500000,
+    "floodplain_pct": 30,
+    "budget_operating": 1500000000,
+    "budget_capital": 200000000
+  },
+  "climate_risk": {
+    "sea_level_median_2050": 0.6,
+    "sea_level_worst_case": 1.2,
+    "recent_storm_damage": 1800000000
+  },
+  "social_context": {
+    "housing_crisis": true,
+    "aging_infrastructure": true,
+    "equity_concerns": "Recent storm damage disproportionately harmed low-income neighborhoods, indicating vulnerability disparities and potential for climate adaptation to exacerbate existing inequities"
+  },
+  "critical_assumptions": [
+    "Discount rate of 3-4% for long-term infrastructure investments",
+    "Population growth rate of 0.5-1.5% annually over 30 years",
+    "Federal/state funding availability at 40-60% of major infrastructure costs",
+    "Insurance penetration rate of 60-80% for residential properties",
+    "Construction cost inflation of 3-5% annually",
+    "Storm frequency increase of 20-40% over 30-year period",
+    "Property tax base erosion of 10-25% in high-risk areas by 2050",
+    "Community acceptance rate of 70-85% for nature-based solutions",
+    "Municipal bond capacity of $50-100M annually for climate adaptation",
+    "Federal managed retreat programs providing 75-90% buyout funding",
+    "Technology cost reductions of 30-50% for green infrastructure over 15 years",
+    "Regional coordination effectiveness at 60-80% of optimal level"
+  ],
+  "key_uncertainties": [
+    {
+      "factor": "Sea level rise acceleration",
+      "range": "0.4-1.8m by 2050",
+      "impact": "Infrastructure sizing and retreat timing"
+    },
+    {
+      "factor": "Federal climate funding availability",
+      "range": "$20-200M over 10 years",
+      "impact": "Project scale and implementation speed"
+    },
+    {
+      "factor": "Property value decline in floodplain",
+      "range": "15-60% by 2040",
+      "impact": "Tax revenue and buyout costs"
+    },
+    {
+      "factor": "Storm damage frequency",
+      "range": "1-in-10 to 1-in-3 year major events",
+      "impact": "Emergency preparedness investment needs"
+    },
+    {
+      "factor": "Population displacement from climate impacts",
+      "range": "5,000-50,000 residents by 2050",
+      "impact": "Housing demand and social service costs"
+    },
+    {
+      "factor": "Nature-based solution effectiveness",
+      "range": "30-80% storm surge reduction",
+      "impact": "Infrastructure investment allocation"
+    },
+    {
+      "factor": "Community resistance to managed retreat",
+      "range": "20-70% participation rate",
+      "impact": "Land use transformation timeline"
+    },
+    {
+      "factor": "Regional economic impacts",
+      "range": "$500M-3B GDP effects by 2050",
+      "impact": "Overall fiscal capacity and priorities"
+    }
+  ]
+}
