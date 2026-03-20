@@ -4,6 +4,8 @@ import json
 import os
 import requests
 from pypdf import PdfReader
+import pymupdf.layout  # activate PyMuPDF-Layout in pymupdf
+import pymupdf4llm
 import gradio as gr
 
 
@@ -77,14 +79,16 @@ class Me:
 
     def __init__(self):
         self.openai = OpenAI()
-        self.name = "Ed Donner"
-        reader = PdfReader("me/linkedin.pdf")
+        self.name = "Patrick Walukagga"
+        # reader = PdfReader("me/linkedin.pdf")
         self.linkedin = ""
-        for page in reader.pages:
-            text = page.extract_text()
-            if text:
-                self.linkedin += text
-        with open("me/summary.txt", "r", encoding="utf-8") as f:
+        # for page in reader.pages:
+        #     text = page.extract_text()
+        #     if text:
+        #         self.linkedin += text
+        self.linkedin = pymupdf4llm.to_markdown("me/linkedin.pdf")
+
+        with open("me/summary.md", "r", encoding="utf-8") as f:
             self.summary = f.read()
 
 
