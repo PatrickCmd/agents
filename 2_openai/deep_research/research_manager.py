@@ -20,7 +20,7 @@ class ResearchManager:
             yield "Searches complete, writing report..."
             report = await self.write_report(query, search_results)
             yield "Report written, sending email..."
-            await self.send_email(report)
+            await self.deliver_report_email(report)
             yield "Email sent, research complete"
             yield report.markdown_report
         
@@ -74,7 +74,7 @@ class ResearchManager:
         print("Finished writing report")
         return result.final_output_as(ReportData)
     
-    async def send_email(self, report: ReportData) -> None:
+    async def deliver_report_email(self, report: ReportData) -> None:
         print("Writing email...")
         result = await Runner.run(
             email_agent,

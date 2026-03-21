@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Async Python: A Comprehensive Tutorial</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg-raised: #161822;
+    --bg-code: #1a1d2e;
+    --bg-aside: #1c1f30;
+    --bg-diagram: #141625;
+    --text: #c9cdd8;
+    --text-bright: #e8ebf0;
+    --text-muted: #7a809a;
+    --heading: #f0f2f7;
+    --accent: #6c9eff;
+    --accent-dim: #4a73cc;
+    --green: #6fcf97;
+    --green-dim: rgba(111, 207, 151, 0.12);
+    --red: #f87171;
+    --red-dim: rgba(248, 113, 113, 0.10);
+    --yellow: #fbbf24;
+    --yellow-dim: rgba(251, 191, 36, 0.10);
+    --purple: #a78bfa;
+    --border: #252840;
+    --border-light: #2e3250;
+    --code-keyword: #c792ea;
+    --code-string: #c3e88d;
+    --code-func: #82aaff;
+    --code-comment: #616584;
+    --code-number: #f78c6c;
+    --code-builtin: #ffcb6b;
+    --code-operator: #89ddff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.72;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* === LAYOUT === */
+  .page-wrapper {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* --- Sidebar / TOC --- */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 280px;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 20px 40px 24px;
+    background: var(--bg-raised);
+    border-right: 1px solid var(--border);
+    z-index: 100;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+
+  .sidebar-title {
+    font-family: 'Source Serif 4', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .toc-list { list-style: none; }
+  .toc-list li { margin-bottom: 2px; }
+  .toc-list a {
+    display: block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .toc-list a:hover { color: var(--text-bright); background: rgba(108,158,255,0.07); }
+  .toc-list .part-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-dim);
+    margin-right: 6px;
+  }
+
+  /* --- Main content --- */
+  .main-content {
+    margin-left: 280px;
+    max-width: 820px;
+    padding: 48px 56px 120px 56px;
+  }
+
+  /* === TYPOGRAPHY === */
+  h1 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--heading);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    font-size: 17px;
+    color: var(--text-muted);
+    margin-bottom: 48px;
+    line-height: 1.6;
+  }
+
+  h2 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--heading);
+    margin-top: 72px;
+    margin-bottom: 8px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  h2 .part-num {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-top: 40px;
+    margin-bottom: 12px;
+  }
+
+  h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-top: 28px;
+    margin-bottom: 8px;
+  }
+
+  p { margin-bottom: 16px; }
+
+  strong { color: var(--text-bright); font-weight: 600; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* === CODE === */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    background: var(--bg-code);
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: var(--purple);
+  }
+
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0 24px 0;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: 13.5px;
+    color: var(--text);
+  }
+
+  /* Syntax highlighting classes */
+  .kw { color: var(--code-keyword); }
+  .fn { color: var(--code-func); }
+  .st { color: var(--code-string); }
+  .cm { color: var(--code-comment); font-style: italic; }
+  .nb { color: var(--code-number); }
+  .bi { color: var(--code-builtin); }
+  .op { color: var(--code-operator); }
+
+  /* === DIAGRAM BOXES === */
+  .diagram {
+    background: var(--bg-diagram);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 20px 0 28px 0;
+    overflow-x: auto;
+  }
+  .diagram pre {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+  .diagram pre code {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+  .diagram-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-dim);
+    margin-bottom: 12px;
+  }
+
+  /* === CALLOUT BOXES === */
+  .callout {
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0 24px 0;
+    border-left: 3px solid;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout-title {
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .callout.tip     { background: var(--green-dim); border-color: var(--green); }
+  .callout.tip .callout-title { color: var(--green); }
+  .callout.warning { background: var(--yellow-dim); border-color: var(--yellow); }
+  .callout.warning .callout-title { color: var(--yellow); }
+  .callout.danger  { background: var(--red-dim); border-color: var(--red); }
+  .callout.danger .callout-title { color: var(--red); }
+  .callout.info    { background: rgba(108,158,255,0.08); border-color: var(--accent); }
+  .callout.info .callout-title { color: var(--accent); }
+
+  .golden-rule {
+    background: rgba(251, 191, 36, 0.06);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    font-family: 'Source Serif 4', serif;
+    font-size: 17px;
+    font-style: italic;
+    color: var(--yellow);
+    text-align: center;
+  }
+
+  /* === TABLES === */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px 0;
+    font-size: 14.5px;
+  }
+  th {
+    background: var(--bg-code);
+    font-weight: 600;
+    color: var(--text-bright);
+    text-align: left;
+    padding: 10px 16px;
+    border-bottom: 2px solid var(--border-light);
+  }
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* === COMPARISON (good/bad) === */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0 24px 0;
+  }
+  .compare-col { border-radius: 10px; padding: 16px 20px; }
+  .compare-col.bad  { background: var(--red-dim); border: 1px solid rgba(248,113,113,0.2); }
+  .compare-col.good { background: var(--green-dim); border: 1px solid rgba(111,207,151,0.2); }
+  .compare-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  .compare-col.bad  .compare-label { color: var(--red); }
+  .compare-col.good .compare-label { color: var(--green); }
+  .compare-col pre { border: none; margin: 0; padding: 8px 0; background: none; }
+
+  /* === EXERCISE CARDS === */
+  .exercise {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 32px 0;
+  }
+  .exercise-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .exercise-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(108,158,255,0.12);
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+  .exercise-title {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--heading);
+  }
+  .exercise-difficulty {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-left: auto;
+  }
+  .exercise-difficulty.easy { background: var(--green-dim); color: var(--green); }
+  .exercise-difficulty.medium { background: var(--yellow-dim); color: var(--yellow); }
+  .exercise-difficulty.hard { background: var(--red-dim); color: var(--red); }
+
+  /* Expandable solution */
+  details {
+    margin-top: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  summary {
+    cursor: pointer;
+    padding: 10px 16px;
+    background: rgba(108,158,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--accent);
+    user-select: none;
+    transition: background 0.15s;
+  }
+  summary:hover { background: rgba(108,158,255,0.12); }
+  details[open] summary { border-radius: 8px 8px 0 0; border-bottom-color: transparent; }
+  details .solution-body {
+    padding: 16px 20px;
+    background: rgba(108,158,255,0.03);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+  }
+
+  /* === MISC === */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  ul, ol { margin: 8px 0 16px 24px; }
+  li { margin-bottom: 6px; }
+
+  .prereq {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 24px;
+    margin-bottom: 40px;
+    font-size: 14.5px;
+    color: var(--text-muted);
+  }
+  .prereq strong { color: var(--text); }
+
+  .ref-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+  .ref-card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  /* Decision tree styling */
+  .decision-tree {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+  .decision-tree .q { color: var(--text-bright); font-weight: 600; }
+  .decision-tree .yes { color: var(--green); font-weight: 600; }
+  .decision-tree .no { color: var(--red); font-weight: 600; }
+  .decision-tree .result { color: var(--accent); font-weight: 600; }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main-content { margin-left: 0; padding: 32px 24px 80px 24px; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+<!-- ============ SIDEBAR ============ -->
+<nav class="sidebar">
+  <div class="sidebar-title">Async Python Tutorial</div>
+  <ul class="toc-list">
+    <li><a href="#part1"><span class="part-label">01</span> Introduction to Async</a></li>
+    <li><a href="#part2"><span class="part-label">02</span> The Event Loop</a></li>
+    <li><a href="#part3"><span class="part-label">03</span> async def &amp; await</a></li>
+    <li><a href="#part4"><span class="part-label">04</span> Notebooks vs Modules</a></li>
+    <li><a href="#part5"><span class="part-label">05</span> Gradio Callbacks</a></li>
+    <li><a href="#part6"><span class="part-label">06</span> asyncio.gather</a></li>
+    <li><a href="#part7"><span class="part-label">07</span> Tips, Traps, Techniques</a></li>
+    <li><a href="#part8"><span class="part-label">08</span> Exercises</a></li>
+  </ul>
+</nav>
+
+<!-- ============ MAIN CONTENT ============ -->
+<main class="main-content">
+
+<h1>Async Python</h1>
+<p class="subtitle">A comprehensive tutorial for students working with Python notebooks and modules in Cursor, using <code>uv</code> for package management.</p>
+
+<div class="prereq">
+  <strong>Prerequisites:</strong> You should be comfortable writing Python functions, using <code>uv</code> for package management, and working in either <code>.py</code> modules or <code>.ipynb</code> notebooks in Cursor.
+</div>
+
+<!-- ======================================================== -->
+<!-- PART 1 -->
+<!-- ======================================================== -->
+<h2 id="part1"><span class="part-num">Part 1</span>Introduction to Async</h2>
+
+<h3>The Problem: Waiting Around</h3>
+
+<p>Consider this everyday scenario. You're making breakfast:</p>
+<ol>
+  <li>Put bread in the toaster (takes 3 minutes)</li>
+  <li>Boil water for tea (takes 4 minutes)</li>
+  <li>Fry an egg (takes 5 minutes)</li>
+</ol>
+
+<p><strong>The synchronous approach</strong> — do each thing one after another:</p>
+
+<div class="diagram">
+  <div class="diagram-label">Synchronous — Total: 12 minutes</div>
+  <pre><code>START
+ ├── Toast bread ............... 3 min
+ ├── Boil water ................ 4 min  (toaster sitting idle)
+ ├── Fry egg ................... 5 min  (kettle sitting idle)
+END</code></pre>
+</div>
+
+<p><strong>The async approach</strong> — start each task, then come back when it's ready:</p>
+
+<div class="diagram">
+  <div class="diagram-label">Async — Total: 5 minutes</div>
+  <pre><code>START
+ ├── Put bread in toaster ──────────┐
+ ├── Put kettle on ─────────────────┤
+ ├── Start frying egg ──────────────┤
+ │                                  │
+ │   ... all three happening at     │
+ │       the same time ...          │
+ │                                  │
+ ├── Toast pops  (3 min) ──────────┤
+ ├── Kettle boils (4 min) ─────────┤
+ ├── Egg done    (5 min) ──────────┘
+END</code></pre>
+</div>
+
+<p>In programming, the things we "wait around" for are called <strong>I/O-bound operations</strong>: network requests (API calls, database queries), file reads/writes, user input. Your CPU is idle while the network does its thing. Async lets you do useful work during that idle time.</p>
+
+<h3>Three Ways to Do Things Concurrently in Python</h3>
+
+<p>Python gives you three main models for doing multiple things at once. They solve <strong>different problems</strong> and are NOT interchangeable.</p>
+
+<h4>1. Multiprocessing — True Parallelism</h4>
+
+<div class="diagram">
+  <pre><code>┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  Process 1   │  │  Process 2   │  │  Process 3   │
+│  (own GIL)   │  │  (own GIL)   │  │  (own GIL)   │
+│  CPU core 1  │  │  CPU core 2  │  │  CPU core 3  │
+└──────┬───────┘  └──────┬───────┘  └──────┬───────┘
+       ▼                 ▼                 ▼
+   Crunching          Crunching        Crunching
+   numbers            numbers          numbers</code></pre>
+</div>
+
+<ul>
+  <li><strong>What it does:</strong> Spawns entirely separate Python processes, each with its own memory and GIL.</li>
+  <li><strong>Best for:</strong> CPU-bound work — number crunching, image processing, ML training loops.</li>
+  <li><strong>Overhead:</strong> High. Spawning a process is expensive. Sharing data between processes requires serialization.</li>
+</ul>
+
+<h4>2. Threading — Concurrent, Not Parallel (in CPython)</h4>
+
+<div class="diagram">
+  <pre><code>┌──────────────────────────────────────────────────┐
+│                  One Process                      │
+│                  One GIL 🔒                       │
+│                                                   │
+│  Thread 1        Thread 2        Thread 3         │
+│  ┌────────┐     ┌────────┐     ┌────────┐        │
+│  │API call│     │API call│     │API call│         │
+│  │waiting…│     │waiting…│     │waiting…│         │
+│  └────────┘     └────────┘     └────────┘        │
+│                                                   │
+│  OS schedules threads; can be interrupted          │
+│  at any time (preemptive scheduling)               │
+└──────────────────────────────────────────────────┘</code></pre>
+</div>
+
+<ul>
+  <li><strong>What it does:</strong> Runs multiple threads within one process. Python's GIL means only one thread executes Python bytecode at a time — but threads <strong>release</strong> the GIL while waiting for I/O.</li>
+  <li><strong>Best for:</strong> I/O-bound work when you need to use libraries that aren't async-aware.</li>
+  <li><strong>Overhead:</strong> Medium. Threads share memory (risk of race conditions), and the OS decides when to switch.</li>
+</ul>
+
+<h4>3. Async (asyncio) — Cooperative Concurrency</h4>
+
+<div class="diagram">
+  <pre><code>┌──────────────────────────────────────────────────┐
+│                  One Process                      │
+│                  One Thread                       │
+│                  One Event Loop 🔄                │
+│                                                   │
+│  Task A          Task B          Task C           │
+│  ┌────────┐                                      │
+│  │run code│                                      │
+│  │ await… │──┐                                   │
+│  └────────┘  │   ┌────────┐                      │
+│              └──▶│run code│                      │
+│                  │ await… │──┐                    │
+│                  └────────┘  │   ┌────────┐      │
+│                              └──▶│run code│      │
+│  ┌────────┐                      │ await… │──┐   │
+│  │resumed!│◀─────────────────────┘        │  │   │
+│  └────────┘                               ▼  │   │
+│                                          ...     │
+│  Tasks voluntarily yield at "await" points       │
+└──────────────────────────────────────────────────┘</code></pre>
+</div>
+
+<ul>
+  <li><strong>What it does:</strong> Runs many tasks in a single thread using <strong>cooperative multitasking</strong>. Tasks say "I'm waiting, go do something else" via <code>await</code>.</li>
+  <li><strong>Best for:</strong> I/O-bound work with async-compatible libraries — API calls, database queries, LLM integrations.</li>
+  <li><strong>Overhead:</strong> Very low. No thread/process creation. No locks needed. No race conditions. Efficient for thousands of concurrent I/O operations.</li>
+</ul>
+
+<h3>When to Use What</h3>
+
+<div class="diagram">
+  <div class="diagram-label">Decision Guide</div>
+  <pre><code><span class="q">Is your code waiting for I/O (network, files, APIs)?</span>
+├── <span class="yes">YES</span> ─── Are the libraries you're using async-compatible?
+│           ├── <span class="yes">YES</span> ──▶ <span class="result">Use asyncio ✅ (this tutorial!)</span>
+│           └── <span class="no">NO</span>  ──▶ <span class="result">Use threading</span>
+│
+└── <span class="no">NO</span>  ─── Is it CPU-intensive? (math, images, ML training)
+            ├── <span class="yes">YES</span> ──▶ <span class="result">Use multiprocessing</span>
+            └── <span class="no">NO</span>  ──▶ <span class="result">You probably don't need concurrency</span></code></pre>
+</div>
+
+<h3>Why Async Matters for This Course</h3>
+
+<p>In this course, you'll frequently call LLM APIs, stream responses, make multiple API calls and combine results, and build Gradio interfaces. Each API call might take 1–10 seconds. With async, you fire them all off concurrently:</p>
+
+<div class="compare">
+  <div class="compare-col bad">
+    <div class="compare-label">❌ Synchronous — ~15 seconds</div>
+    <pre><code>result1 = call_openai(<span class="st">"prompt 1"</span>)     <span class="cm"># 5s</span>
+result2 = call_anthropic(<span class="st">"prompt 2"</span>) <span class="cm"># 5s</span>
+result3 = call_openai(<span class="st">"prompt 3"</span>)     <span class="cm"># 5s</span></code></pre>
+  </div>
+  <div class="compare-col good">
+    <div class="compare-label">✅ Async — ~5 seconds</div>
+    <pre><code>r1, r2, r3 = <span class="kw">await</span> asyncio.gather(
+    call_openai(<span class="st">"prompt 1"</span>),     <span class="cm"># 5s ─┐</span>
+    call_anthropic(<span class="st">"prompt 2"</span>), <span class="cm"># 5s ─┤</span>
+    call_openai(<span class="st">"prompt 3"</span>),     <span class="cm"># 5s ─┘</span>
+)</code></pre>
+  </div>
+</div>
+
+
+<!-- ======================================================== -->
+<!-- PART 2 -->
+<!-- ======================================================== -->
+<h2 id="part2"><span class="part-num">Part 2</span>The Event Loop</h2>
+
+<h3>What Is the Event Loop?</h3>
+
+<p>The event loop is the engine at the heart of async Python. Think of it as a <strong>really efficient receptionist</strong> who manages a waiting room full of tasks.</p>
+
+<div class="diagram">
+  <div class="diagram-label">The Event Loop</div>
+  <pre><code>┌──────────────────────────────────────────────────────────┐
+│                    THE EVENT LOOP                         │
+│                                                          │
+│   ┌─────────────┐    Ready Queue:                        │
+│   │  Currently  │    ┌──────┐ ┌──────┐ ┌──────┐         │
+│   │  Running:   │◀───│Task A│ │Task C│ │Task E│         │
+│   │  Task A     │    └──────┘ └──────┘ └──────┘         │
+│   └─────┬───────┘                                        │
+│         │                                                │
+│         │ hits "await"   Waiting for I/O:                │
+│         ▼                ┌──────┐ ┌──────┐               │
+│   Task A moves ─────────▶│Task B│ │Task D│               │
+│   to waiting area        │(API) │ │(file)│               │
+│                          └──┬───┘ └──────┘               │
+│   Next ready task runs      │                            │
+│                          API response arrives:            │
+│                          Task B → Ready Queue             │
+│                                                          │
+│   🔄  Repeat until all tasks are done                    │
+└──────────────────────────────────────────────────────────┘</code></pre>
+</div>
+
+<p>Here's what the event loop does, over and over:</p>
+<ol>
+  <li><strong>Pick</strong> the next ready task from the queue.</li>
+  <li><strong>Run</strong> it until it hits an <code>await</code>.</li>
+  <li><strong>Park</strong> the task in the waiting area.</li>
+  <li><strong>Check</strong> if any waiting tasks have received their I/O results.</li>
+  <li><strong>Move</strong> completed I/O tasks back to the ready queue.</li>
+  <li><strong>Repeat</strong> from step 1.</li>
+</ol>
+
+<h3>A Concrete Timeline</h3>
+
+<p>Let's trace through three sequential <code>await</code> calls:</p>
+
+<pre><code><span class="kw">async def</span> <span class="fn">main</span>():
+    result1 = <span class="kw">await</span> fetch(<span class="st">"https://api.example.com/a"</span>)  <span class="cm"># Takes 2 seconds</span>
+    result2 = <span class="kw">await</span> fetch(<span class="st">"https://api.example.com/b"</span>)  <span class="cm"># Takes 1 second</span>
+    result3 = <span class="kw">await</span> fetch(<span class="st">"https://api.example.com/c"</span>)  <span class="cm"># Takes 3 seconds</span></code></pre>
+
+<div class="callout warning">
+  <div class="callout-title">⚠️ This is still sequential!</div>
+  <p>Each <code>await</code> pauses <code>main()</code> until the fetch completes. The event loop <em>could</em> run other tasks during the wait, but we only have one task here, so there's nothing else to run. Total time: 6 seconds.</p>
+</div>
+
+<div class="diagram">
+  <div class="diagram-label">Sequential awaits — no concurrency benefit</div>
+  <pre><code>Time ──▶
+0s       1s       2s       3s       4s       5s       6s
+│        │        │        │        │        │        │
+├── fetch A (waiting...) ──┤
+│                          ├── fetch B (wait) ─┤
+│                                              ├── fetch C (waiting...) ──┤
+│                                                                        │
+Total: 6 seconds</code></pre>
+</div>
+
+<p>To get actual concurrency, you need multiple tasks running at the same time. We'll see how with <code>asyncio.gather</code> in Part 6. First, let's learn the basics.</p>
+
+<div class="golden-rule">
+  The event loop can only switch between tasks at <code>await</code> points.<br>
+  If your code runs a long computation without <code>await</code>, it blocks everything.
+</div>
+
+<div class="compare">
+  <div class="compare-col bad">
+    <div class="compare-label">❌ Blocks the event loop</div>
+    <pre><code><span class="kw">async def</span> <span class="fn">bad_function</span>():
+    total = <span class="nb">0</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">100_000_000</span>):
+        total += i  <span class="cm"># no await — nothing else runs</span>
+    <span class="kw">return</span> total</code></pre>
+  </div>
+  <div class="compare-col good">
+    <div class="compare-label">✅ Yields at await points</div>
+    <pre><code><span class="kw">async def</span> <span class="fn">good_function</span>():
+    <span class="kw">async with</span> aiohttp.ClientSession() <span class="kw">as</span> s:
+        resp = <span class="kw">await</span> s.get(url)  <span class="cm"># loop is free</span>
+        data = <span class="kw">await</span> resp.json() <span class="cm"># and here too</span>
+        <span class="kw">return</span> data</code></pre>
+  </div>
+</div>
+
+
+<!-- ======================================================== -->
+<!-- PART 3 -->
+<!-- ======================================================== -->
+<h2 id="part3"><span class="part-num">Part 3</span>Simple <code>async def</code> and <code>await</code></h2>
+
+<h3>Your First Coroutine</h3>
+
+<p>A function defined with <code>async def</code> is called a <strong>coroutine function</strong>. When you call it, you get a <strong>coroutine object</strong> — it doesn't run immediately.</p>
+
+<pre><code><span class="kw">import</span> asyncio
+
+<span class="cm"># This is a coroutine function</span>
+<span class="kw">async def</span> <span class="fn">greet</span>(name: <span class="bi">str</span>) -> <span class="bi">str</span>:
+    <span class="bi">print</span>(<span class="st">f"Starting to greet </span>{name}<span class="st">..."</span>)
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">1</span>)  <span class="cm"># Simulate a 1-second delay</span>
+    <span class="bi">print</span>(<span class="st">f"Done greeting </span>{name}<span class="st">!"</span>)
+    <span class="kw">return</span> <span class="st">f"Hello, </span>{name}<span class="st">!"</span>
+
+<span class="cm"># Calling it does NOT run it — returns a coroutine object</span>
+coro = greet(<span class="st">"Alice"</span>)
+<span class="bi">print</span>(<span class="bi">type</span>(coro))  <span class="cm"># &lt;class 'coroutine'&gt;</span>
+
+<span class="cm"># You must either:</span>
+<span class="cm"># 1. "await" it from inside another async function, or</span>
+<span class="cm"># 2. Run it with asyncio.run() from synchronous code</span></code></pre>
+
+<h3><code>await</code> — The Magic Word</h3>
+
+<p><code>await</code> does two things:</p>
+<ol>
+  <li><strong>Pauses</strong> the current coroutine and gives control back to the event loop.</li>
+  <li><strong>Resumes</strong> the coroutine when the awaited thing is done, giving you its result.</li>
+</ol>
+
+<pre><code><span class="kw">async def</span> <span class="fn">make_breakfast</span>():
+    toast = <span class="kw">await</span> make_toast()       <span class="cm"># Pause... resume with toast</span>
+    tea   = <span class="kw">await</span> make_tea()         <span class="cm"># Pause... resume with tea</span>
+    egg   = <span class="kw">await</span> fry_egg()          <span class="cm"># Pause... resume with egg</span>
+    <span class="kw">return</span> toast, tea, egg</code></pre>
+
+<div class="callout info">
+  <div class="callout-title">Rule</div>
+  <p>You can only use <code>await</code> inside an <code>async def</code> function. Using it in a regular function gives a <code>SyntaxError</code>.</p>
+</div>
+
+<h3>A Complete Working Example</h3>
+
+<pre><code><span class="kw">import</span> asyncio
+<span class="kw">import</span> time
+
+<span class="kw">async def</span> <span class="fn">fetch_data</span>(source: <span class="bi">str</span>, delay: <span class="bi">float</span>) -> <span class="bi">dict</span>:
+    <span class="st">"""Simulate fetching data from an API."""</span>
+    <span class="bi">print</span>(<span class="st">f"  📡 Starting fetch from </span>{source}<span class="st">..."</span>)
+    <span class="kw">await</span> asyncio.sleep(delay)
+    <span class="bi">print</span>(<span class="st">f"  ✅ Got data from </span>{source}<span class="st">!"</span>)
+    <span class="kw">return</span> {<span class="st">"source"</span>: source, <span class="st">"data"</span>: <span class="st">f"Results from </span>{source}<span class="st">"</span>}
+
+<span class="kw">async def</span> <span class="fn">main</span>():
+    start = time.time()
+
+    <span class="cm"># These run sequentially</span>
+    result1 = <span class="kw">await</span> fetch_data(<span class="st">"OpenAI"</span>, <span class="nb">2.0</span>)
+    result2 = <span class="kw">await</span> fetch_data(<span class="st">"Anthropic"</span>, <span class="nb">1.5</span>)
+    result3 = <span class="kw">await</span> fetch_data(<span class="st">"Google"</span>, <span class="nb">1.0</span>)
+
+    elapsed = time.time() - start
+    <span class="bi">print</span>(<span class="st">f"\nAll done in </span>{elapsed:.1f}<span class="st"> seconds"</span>)
+
+<span class="cm"># From a .py file (see Part 4 for notebooks)</span>
+asyncio.run(main())</code></pre>
+
+<p><strong>Output:</strong> Total time is ~4.5 seconds because they ran one after another. We'll make this concurrent in Part 6.</p>
+
+<h3>What Can You <code>await</code>?</h3>
+
+<table>
+  <thead>
+    <tr><th>Awaitable</th><th>What it is</th><th>Example</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Coroutine</td><td>Calling an <code>async def</code> function</td><td><code>await fetch_data("API", 1.0)</code></td></tr>
+    <tr><td><code>asyncio.sleep()</code></td><td>Timer / delay</td><td><code>await asyncio.sleep(2)</code></td></tr>
+    <tr><td><code>asyncio.gather()</code></td><td>Run multiple awaitables concurrently</td><td><code>await asyncio.gather(a, b)</code></td></tr>
+    <tr><td><code>asyncio.create_task()</code></td><td>Schedule a coroutine as a Task</td><td><code>t = asyncio.create_task(c)</code></td></tr>
+    <tr><td>Library awaitables</td><td>Async HTTP, DB queries, etc.</td><td><code>await session.get(url)</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Async Functions Calling Other Async Functions</h3>
+
+<p>Async functions compose naturally — just <code>await</code> them. The <strong>async/await propagation rule</strong>: if a function needs to <code>await</code> something, it must itself be <code>async def</code>. This tends to "infect" upward — that's normal. It's called the <strong>"function coloring" problem</strong>.</p>
+
+<div class="diagram">
+  <div class="diagram-label">The async call chain</div>
+  <pre><code>plan_trip()              ← must be async (calls get_recommendation)
+  └── get_recommendation() ← must be async (calls get_weather)
+        └── get_weather()    ← must be async (uses await)
+              └── asyncio.sleep() ← an awaitable</code></pre>
+</div>
+
+
+<!-- ======================================================== -->
+<!-- PART 4 -->
+<!-- ======================================================== -->
+<h2 id="part4"><span class="part-num">Part 4</span>Running Async Code: Notebooks vs Modules</h2>
+
+<p>This is one of the trickiest parts of async Python, and the source of many confusing errors. The rules are different depending on where your code runs.</p>
+
+<div class="diagram">
+  <div class="diagram-label">The Core Problem</div>
+  <pre><code><span class="q">Where is your code running?</span>
+│
+├── In a <span class="result">.py module</span> (script) ──▶ No event loop exists.
+│                                  You must create one with <span class="result">asyncio.run()</span>
+│
+└── In a <span class="result">.ipynb notebook</span> ──────▶ An event loop is ALREADY RUNNING.
+    (Jupyter / Cursor)             You must NOT call asyncio.run()
+                                   Just use <span class="result">"await" directly</span> in a cell!</code></pre>
+</div>
+
+<h3>Running Async in a Python Module (.py file)</h3>
+
+<pre><code><span class="cm"># my_script.py</span>
+
+<span class="kw">import</span> asyncio
+
+<span class="kw">async def</span> <span class="fn">fetch_data</span>() -> <span class="bi">str</span>:
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">1</span>)
+    <span class="kw">return</span> <span class="st">"got data"</span>
+
+<span class="kw">async def</span> <span class="fn">main</span>():
+    result = <span class="kw">await</span> fetch_data()
+    <span class="bi">print</span>(result)
+
+<span class="cm"># Entry point — creates an event loop, runs main(), closes loop</span>
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    asyncio.run(main())</code></pre>
+
+<pre><code><span class="cm"># Run from terminal:</span>
+uv run python my_script.py</code></pre>
+
+<h3>Running Async in a Notebook (.ipynb)</h3>
+
+<p>Jupyter/Cursor notebooks already run an event loop behind the scenes. This means:</p>
+
+<div class="compare">
+  <div class="compare-col good">
+    <div class="compare-label">✅ Do this in a notebook</div>
+    <pre><code><span class="cm"># Just await directly!</span>
+result = <span class="kw">await</span> fetch_data()
+<span class="bi">print</span>(result)</code></pre>
+  </div>
+  <div class="compare-col bad">
+    <div class="compare-label">❌ Don't do this in a notebook</div>
+    <pre><code>asyncio.run(main())
+<span class="cm"># RuntimeError: This event loop</span>
+<span class="cm"># is already running.</span></code></pre>
+  </div>
+</div>
+
+<h3>Side-by-Side: Same Logic, Two Environments</h3>
+
+<div class="compare">
+  <div class="compare-col good" style="background: rgba(108,158,255,0.06); border-color: rgba(108,158,255,0.2);">
+    <div class="compare-label" style="color: var(--accent);">📄 .py module</div>
+    <pre><code><span class="kw">import</span> asyncio
+
+<span class="kw">async def</span> <span class="fn">fetch_data</span>(name):
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">1</span>)
+    <span class="kw">return</span> <span class="st">f"Data from </span>{name}<span class="st">"</span>
+
+<span class="kw">async def</span> <span class="fn">main</span>():
+    results = <span class="kw">await</span> asyncio.gather(
+        fetch_data(<span class="st">"API-1"</span>),
+        fetch_data(<span class="st">"API-2"</span>),
+    )
+    <span class="kw">for</span> r <span class="kw">in</span> results:
+        <span class="bi">print</span>(r)
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    asyncio.run(main())  <span class="cm"># ← entry point</span></code></pre>
+  </div>
+  <div class="compare-col good" style="background: rgba(167,139,250,0.06); border-color: rgba(167,139,250,0.2);">
+    <div class="compare-label" style="color: var(--purple);">📓 .ipynb notebook</div>
+    <pre><code><span class="cm"># Cell 1</span>
+<span class="kw">import</span> asyncio
+
+<span class="kw">async def</span> <span class="fn">fetch_data</span>(name):
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">1</span>)
+    <span class="kw">return</span> <span class="st">f"Data from </span>{name}<span class="st">"</span>
+
+<span class="cm"># Cell 2 — just await directly!</span>
+results = <span class="kw">await</span> asyncio.gather(
+    fetch_data(<span class="st">"API-1"</span>),
+    fetch_data(<span class="st">"API-2"</span>),
+)
+<span class="kw">for</span> r <span class="kw">in</span> results:
+    <span class="bi">print</span>(r)</code></pre>
+  </div>
+</div>
+
+<h3>The <code>nest_asyncio</code> Escape Hatch</h3>
+
+<p>Sometimes you need to run code designed for scripts inside a notebook (e.g., a library that calls <code>asyncio.run()</code> internally). The <code>nest_asyncio</code> package patches the event loop to allow nested calls:</p>
+
+<pre><code><span class="cm"># Install</span>
+uv add nest_asyncio</code></pre>
+
+<pre><code><span class="cm"># In a notebook cell — only if you absolutely need asyncio.run()</span>
+<span class="kw">import</span> nest_asyncio
+nest_asyncio.apply()
+
+asyncio.run(main())  <span class="cm"># Now this works in a notebook</span></code></pre>
+
+<div class="callout warning">
+  <div class="callout-title">Use sparingly</div>
+  <p><code>nest_asyncio</code> is a workaround, not a best practice. Prefer <code>await</code> directly in notebooks whenever possible.</p>
+</div>
+
+<div class="ref-card">
+  <div class="ref-card-title">Quick Reference Card</div>
+  <table>
+    <thead><tr><th>Environment</th><th>How to Run</th><th>Common Mistake</th></tr></thead>
+    <tbody>
+      <tr><td><code>.py</code> module</td><td><code>asyncio.run(main())</code></td><td>Using bare <code>await</code> (SyntaxError)</td></tr>
+      <tr><td><code>.ipynb</code> notebook</td><td><code>await main()</code> directly</td><td>Using <code>asyncio.run()</code> (RuntimeError)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Installing Async HTTP Libraries</h3>
+
+<pre><code><span class="cm"># httpx — recommended; supports both sync and async</span>
+uv add httpx
+
+<span class="cm"># aiohttp — battle-tested, async-only</span>
+uv add aiohttp</code></pre>
+
+<pre><code><span class="cm"># httpx (recommended — familiar requests-like API)</span>
+<span class="kw">import</span> httpx
+
+<span class="kw">async def</span> <span class="fn">call_api</span>():
+    <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+        response = <span class="kw">await</span> client.get(<span class="st">"https://api.example.com/data"</span>)
+        <span class="kw">return</span> response.json()</code></pre>
+
+
+<!-- ======================================================== -->
+<!-- PART 5 -->
+<!-- ======================================================== -->
+<h2 id="part5"><span class="part-num">Part 5</span>Async with Gradio Callbacks</h2>
+
+<p>One of the delightful things about Gradio is that it natively supports async callback functions. Define your event handlers as <code>async def</code> and Gradio handles the rest.</p>
+
+<h3>Sync vs Async Gradio — Spot the Difference</h3>
+
+<div class="compare">
+  <div class="compare-col good" style="background: rgba(108,158,255,0.06); border-color: rgba(108,158,255,0.2);">
+    <div class="compare-label" style="color: var(--text-muted);">Synchronous (what you know)</div>
+    <pre><code><span class="kw">import</span> gradio <span class="kw">as</span> gr
+
+<span class="kw">def</span> <span class="fn">greet</span>(name: <span class="bi">str</span>) -> <span class="bi">str</span>:
+    <span class="kw">return</span> <span class="st">f"Hello, </span>{name}<span class="st">!"</span>
+
+demo = gr.Interface(
+    fn=greet,
+    inputs=<span class="st">"text"</span>,
+    outputs=<span class="st">"text"</span>,
+)
+demo.launch()</code></pre>
+  </div>
+  <div class="compare-col good">
+    <div class="compare-label">✅ Async (just add async!)</div>
+    <pre><code><span class="kw">import</span> gradio <span class="kw">as</span> gr
+<span class="kw">import</span> httpx
+
+<span class="kw">async def</span> <span class="fn">greet</span>(name: <span class="bi">str</span>) -> <span class="bi">str</span>:
+    <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> c:
+        r = <span class="kw">await</span> c.get(<span class="st">f"...?name=</span>{name}<span class="st">"</span>)
+    <span class="kw">return</span> r.json()[<span class="st">"greeting"</span>]
+
+demo = gr.Interface(
+    fn=greet,  <span class="cm"># Gradio auto-detects async</span>
+    inputs=<span class="st">"text"</span>,
+    outputs=<span class="st">"text"</span>,
+)
+demo.launch()</code></pre>
+  </div>
+</div>
+
+<p>That's it. No <code>asyncio.run()</code>, no special wrappers. Gradio detects that your function is a coroutine function and handles it automatically.</p>
+
+<h3>A Realistic Example: Concurrent LLM Calls</h3>
+
+<pre><code><span class="kw">import</span> gradio <span class="kw">as</span> gr
+<span class="kw">import</span> httpx
+<span class="kw">import</span> asyncio
+<span class="kw">import</span> os
+
+API_KEY = os.environ.get(<span class="st">"OPENAI_API_KEY"</span>)
+
+<span class="kw">async def</span> <span class="fn">call_llm</span>(client, prompt, style):
+    response = <span class="kw">await</span> client.post(
+        <span class="st">"https://api.openai.com/v1/chat/completions"</span>,
+        headers={<span class="st">"Authorization"</span>: <span class="st">f"Bearer </span>{API_KEY}<span class="st">"</span>},
+        json={
+            <span class="st">"model"</span>: <span class="st">"gpt-4o-mini"</span>,
+            <span class="st">"messages"</span>: [
+                {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: <span class="st">f"Respond in a </span>{style}<span class="st"> style."</span>},
+                {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt},
+            ],
+        },
+        timeout=<span class="nb">30.0</span>,
+    )
+    <span class="kw">return</span> response.json()[<span class="st">"choices"</span>][<span class="nb">0</span>][<span class="st">"message"</span>][<span class="st">"content"</span>]
+
+<span class="kw">async def</span> <span class="fn">compare_responses</span>(prompt):
+    <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+        a, b = <span class="kw">await</span> asyncio.gather(
+            call_llm(client, prompt, <span class="st">"concise and technical"</span>),
+            call_llm(client, prompt, <span class="st">"friendly and detailed"</span>),
+        )
+    <span class="kw">return</span> a, b
+
+demo = gr.Interface(
+    fn=compare_responses,
+    inputs=gr.Textbox(label=<span class="st">"Your prompt"</span>),
+    outputs=[gr.Textbox(label=<span class="st">"Concise"</span>), gr.Textbox(label=<span class="st">"Detailed"</span>)],
+    title=<span class="st">"LLM Response Comparator"</span>,
+)
+demo.launch()</code></pre>
+
+<h3>Why This Works — Under the Hood</h3>
+
+<div class="diagram">
+  <div class="diagram-label">Gradio's Callback Routing</div>
+  <pre><code>User clicks "Submit"
+ │
+ ├── Is callback <span class="kw">async def</span>?
+ │   ├── <span class="yes">YES</span> ──▶ <span class="result">await callback(inputs)</span>
+ │   │          Runs on Gradio's event loop. Efficient!
+ │   │
+ │   └── <span class="no">NO</span>  ──▶ <span class="result">run_in_executor(callback, inputs)</span>
+ │              Runs in a thread pool. Works, but less efficient.
+ │
+ └── Gradio is built on FastAPI + Starlette (async frameworks)
+     so it already has an event loop running.</code></pre>
+</div>
+
+<h3>Streaming with Async Generators</h3>
+
+<pre><code><span class="kw">import</span> gradio <span class="kw">as</span> gr
+<span class="kw">import</span> asyncio
+
+<span class="kw">async def</span> <span class="fn">stream_response</span>(prompt: <span class="bi">str</span>):
+    <span class="st">"""Simulate streaming tokens from an LLM."""</span>
+    words = <span class="st">f"Here is a response to: </span>{prompt}<span class="st">"</span>.split()
+    partial = <span class="st">""</span>
+    <span class="kw">for</span> word <span class="kw">in</span> words:
+        <span class="kw">await</span> asyncio.sleep(<span class="nb">0.2</span>)
+        partial += word + <span class="st">" "</span>
+        <span class="kw">yield</span> partial  <span class="cm"># Gradio updates output with each yield</span>
+
+demo = gr.Interface(fn=stream_response, inputs=<span class="st">"text"</span>, outputs=<span class="st">"text"</span>)
+demo.launch()</code></pre>
+
+<div class="callout tip">
+  <div class="callout-title">Key Takeaway</div>
+  <p><strong>Sync callbacks</strong> are fine for simple logic. <strong>Async callbacks</strong> are better when you make I/O calls. <strong>Async + <code>asyncio.gather</code></strong> is ideal for multiple concurrent I/O calls. You never need to worry about event loop management in Gradio.</p>
+</div>
+
+
+<!-- ======================================================== -->
+<!-- PART 6 -->
+<!-- ======================================================== -->
+<h2 id="part6"><span class="part-num">Part 6</span>Advanced: <code>asyncio.gather</code></h2>
+
+<p>This is where async truly shines. <code>asyncio.gather</code> lets you run multiple coroutines <strong>concurrently</strong> and collect all their results.</p>
+
+<h3>The Basic Pattern</h3>
+
+<pre><code><span class="kw">import</span> asyncio
+
+<span class="kw">async def</span> <span class="fn">fetch</span>(url: <span class="bi">str</span>, delay: <span class="bi">float</span>) -> <span class="bi">str</span>:
+    <span class="bi">print</span>(<span class="st">f"  Fetching </span>{url}<span class="st">..."</span>)
+    <span class="kw">await</span> asyncio.sleep(delay)
+    <span class="bi">print</span>(<span class="st">f"  Got </span>{url}<span class="st">!"</span>)
+    <span class="kw">return</span> <span class="st">f"Data from </span>{url}<span class="st">"</span>
+
+<span class="kw">async def</span> <span class="fn">main</span>():
+    <span class="cm"># 🚀 All three run concurrently!</span>
+    results = <span class="kw">await</span> asyncio.gather(
+        fetch(<span class="st">"api.openai.com"</span>, <span class="nb">2.0</span>),
+        fetch(<span class="st">"api.anthropic.com"</span>, <span class="nb">1.5</span>),
+        fetch(<span class="st">"api.google.com"</span>, <span class="nb">1.0</span>),
+    )
+    <span class="bi">print</span>(results)</code></pre>
+
+<p>All three started immediately! Total time: ~2 seconds (the slowest), not ~4.5 seconds (the sum).</p>
+
+<div class="diagram">
+  <div class="diagram-label">Sequential vs Concurrent Timeline</div>
+  <pre><code><strong>Without gather (sequential):</strong>
+Time ──▶  0s       1s       2s       3s       4s       5s
+          ├── fetch A ──────────────┤                       2.0s
+          │                         ├── fetch B ────────┤   1.5s
+          │                                             ├── fetch C ───┤  1.0s
+          Total: 4.5 seconds
+
+<strong>With gather (concurrent):</strong>
+Time ──▶  0s       1s       2s
+          ├── fetch A ──────────────┤  2.0s
+          ├── fetch B ────────┤        1.5s
+          ├── fetch C ───┤             1.0s
+          Total: 2.0 seconds ✅</code></pre>
+</div>
+
+<h3>Results Come Back in Order</h3>
+
+<p><code>asyncio.gather</code> preserves the <strong>order of arguments</strong>, not the order of completion:</p>
+
+<pre><code>results = <span class="kw">await</span> asyncio.gather(
+    slow_task(),    <span class="cm"># finishes third  → results[0]</span>
+    fast_task(),    <span class="cm"># finishes first  → results[1]</span>
+    medium_task(),  <span class="cm"># finishes second → results[2]</span>
+)
+<span class="cm"># results[0] is ALWAYS from slow_task, regardless of finish order</span></code></pre>
+
+<h3>Handling Errors</h3>
+
+<pre><code><span class="cm"># Default: one failure cancels everything</span>
+<span class="kw">try</span>:
+    results = <span class="kw">await</span> asyncio.gather(task_a(), task_b(), task_c())
+<span class="kw">except</span> <span class="bi">Exception</span> <span class="kw">as</span> e:
+    <span class="bi">print</span>(<span class="st">f"Something failed: </span>{e}<span class="st">"</span>)
+
+<span class="cm"># With return_exceptions=True: failures become return values</span>
+results = <span class="kw">await</span> asyncio.gather(
+    task_a(), task_b(), task_c(),
+    return_exceptions=<span class="kw">True</span>,
+)
+
+<span class="cm"># Check which results are errors:</span>
+<span class="kw">for</span> i, result <span class="kw">in</span> <span class="bi">enumerate</span>(results):
+    <span class="kw">if</span> <span class="bi">isinstance</span>(result, <span class="bi">Exception</span>):
+        <span class="bi">print</span>(<span class="st">f"Task </span>{i}<span class="st"> failed: </span>{result}<span class="st">"</span>)
+    <span class="kw">else</span>:
+        <span class="bi">print</span>(<span class="st">f"Task </span>{i}<span class="st"> succeeded: </span>{result}<span class="st">"</span>)</code></pre>
+
+<h3><code>gather</code> vs <code>create_task</code></h3>
+
+<table>
+  <thead><tr><th>Pattern</th><th>Use When</th><th>Behavior</th></tr></thead>
+  <tbody>
+    <tr><td><code>asyncio.gather(a, b, c)</code></td><td>You want all results together</td><td>Returns when ALL tasks complete</td></tr>
+    <tr><td><code>asyncio.create_task(a)</code></td><td>You want to start something and check later</td><td>Returns a Task handle immediately</td></tr>
+  </tbody>
+</table>
+
+<pre><code><span class="kw">async def</span> <span class="fn">main</span>():
+    <span class="cm"># Start a slow background task</span>
+    slow_task = asyncio.create_task(fetch(<span class="st">"slow-api.com"</span>, <span class="nb">5.0</span>))
+
+    <span class="cm"># Do quick work while it runs</span>
+    quick_result = <span class="kw">await</span> fetch(<span class="st">"fast-api.com"</span>, <span class="nb">0.5</span>)
+    <span class="bi">print</span>(<span class="st">f"Quick: </span>{quick_result}<span class="st">"</span>)
+
+    <span class="cm"># Now wait for the slow task</span>
+    slow_result = <span class="kw">await</span> slow_task
+    <span class="bi">print</span>(<span class="st">f"Slow: </span>{slow_result}<span class="st">"</span>)</code></pre>
+
+<h3>Dynamic Number of Tasks</h3>
+
+<pre><code><span class="kw">async def</span> <span class="fn">process_all_urls</span>(urls: <span class="bi">list</span>[<span class="bi">str</span>]) -> <span class="bi">list</span>[<span class="bi">str</span>]:
+    <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+        coroutines = [client.get(url) <span class="kw">for</span> url <span class="kw">in</span> urls]
+        responses = <span class="kw">await</span> asyncio.gather(*coroutines)
+        <span class="kw">return</span> [r.text <span class="kw">for</span> r <span class="kw">in</span> responses]</code></pre>
+
+<h3><code>asyncio.TaskGroup</code> — The Modern Alternative (Python 3.11+)</h3>
+
+<pre><code><span class="kw">async def</span> <span class="fn">main</span>():
+    <span class="kw">async with</span> asyncio.TaskGroup() <span class="kw">as</span> tg:
+        task1 = tg.create_task(fetch(<span class="st">"api-1.com"</span>, <span class="nb">1.0</span>))
+        task2 = tg.create_task(fetch(<span class="st">"api-2.com"</span>, <span class="nb">2.0</span>))
+        task3 = tg.create_task(fetch(<span class="st">"api-3.com"</span>, <span class="nb">1.5</span>))
+
+    <span class="cm"># All tasks guaranteed done here</span>
+    <span class="bi">print</span>(task1.result(), task2.result(), task3.result())</code></pre>
+
+<p>Key difference: if any task in a <code>TaskGroup</code> raises an exception, all other tasks are cancelled, and you get an <code>ExceptionGroup</code>. More predictable than <code>gather</code>'s default behavior.</p>
+
+
+<!-- ======================================================== -->
+<!-- PART 7 -->
+<!-- ======================================================== -->
+<h2 id="part7"><span class="part-num">Part 7</span>Tips, Traps and Techniques</h2>
+
+<h3>Trap 1: Forgetting to <code>await</code></h3>
+
+<p>The single most common async bug. Without <code>await</code>, you get a coroutine object — not the result.</p>
+
+<div class="compare">
+  <div class="compare-col bad">
+    <div class="compare-label">❌ Bug: Missing await</div>
+    <pre><code><span class="kw">async def</span> <span class="fn">main</span>():
+    result = fetch_data()  <span class="cm"># coroutine object!</span>
+    <span class="bi">print</span>(result)
+    <span class="cm"># &lt;coroutine object fetch_data at 0x...&gt;</span></code></pre>
+  </div>
+  <div class="compare-col good">
+    <div class="compare-label">✅ Fix: Add await</div>
+    <pre><code><span class="kw">async def</span> <span class="fn">main</span>():
+    result = <span class="kw">await</span> fetch_data()  <span class="cm"># actual value!</span>
+    <span class="bi">print</span>(result)
+    <span class="cm"># "Data from API"</span></code></pre>
+  </div>
+</div>
+
+<div class="callout warning">
+  <div class="callout-title">Watch for this warning</div>
+  <p><code>RuntimeWarning: coroutine 'fetch_data' was never awaited</code> — always take this seriously.</p>
+</div>
+
+<h3>Trap 2: Blocking the Event Loop</h3>
+
+<p>If you run CPU-intensive or synchronous I/O code inside an async function, you block the entire event loop.</p>
+
+<div class="compare">
+  <div class="compare-col bad">
+    <div class="compare-label">❌ Blocking calls</div>
+    <pre><code><span class="kw">import</span> time, requests
+
+<span class="kw">async def</span> <span class="fn">bad</span>():
+    time.sleep(<span class="nb">5</span>)            <span class="cm"># BLOCKS!</span>
+    requests.get(url)        <span class="cm"># BLOCKS!</span>
+    sum(<span class="bi">range</span>(<span class="nb">10**8</span>))       <span class="cm"># BLOCKS!</span></code></pre>
+  </div>
+  <div class="compare-col good">
+    <div class="compare-label">✅ Async equivalents</div>
+    <pre><code><span class="kw">import</span> asyncio, httpx
+
+<span class="kw">async def</span> <span class="fn">good</span>():
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">5</span>)     <span class="cm"># yields</span>
+    <span class="kw">await</span> client.get(url)      <span class="cm"># yields</span>
+    <span class="kw">await</span> asyncio.to_thread(   <span class="cm"># offload</span>
+        sum, <span class="bi">range</span>(<span class="nb">10**8</span>))</code></pre>
+  </div>
+</div>
+
+<h3>Trap 3: Creating Coroutines Without Scheduling Them</h3>
+
+<div class="compare">
+  <div class="compare-col bad">
+    <div class="compare-label">❌ Created but never run</div>
+    <pre><code><span class="kw">async def</span> <span class="fn">main</span>():
+    fetch_data(<span class="st">"api-1"</span>)  <span class="cm"># just created</span>
+    fetch_data(<span class="st">"api-2"</span>)  <span class="cm"># garbage collected!</span></code></pre>
+  </div>
+  <div class="compare-col good">
+    <div class="compare-label">✅ Await or gather them</div>
+    <pre><code><span class="kw">async def</span> <span class="fn">main</span>():
+    <span class="kw">await</span> asyncio.gather(
+        fetch_data(<span class="st">"api-1"</span>),
+        fetch_data(<span class="st">"api-2"</span>),
+    )</code></pre>
+  </div>
+</div>
+
+<h3>Trap 4: <code>asyncio.run()</code> Inside a Running Loop</h3>
+
+<div class="compare">
+  <div class="compare-col bad">
+    <div class="compare-label">❌ Crashes in a notebook</div>
+    <pre><code><span class="kw">def</span> <span class="fn">my_function</span>():
+    result = asyncio.run(helper())
+    <span class="kw">return</span> result
+
+my_function()
+<span class="cm"># 💥 RuntimeError: This event loop</span>
+<span class="cm"># is already running.</span></code></pre>
+  </div>
+  <div class="compare-col good">
+    <div class="compare-label">✅ Just await in notebooks</div>
+    <pre><code>result = <span class="kw">await</span> helper()
+
+
+
+<span class="cm"># Works perfectly in a notebook cell</span>
+
+</code></pre>
+  </div>
+</div>
+
+<h3>Trap 5: Logical Race Conditions</h3>
+
+<p>Async is single-threaded — no traditional data races. But you <em>can</em> have <strong>logical</strong> races when <code>await</code> separates a read from a write:</p>
+
+<pre><code>counter = <span class="nb">0</span>
+
+<span class="kw">async def</span> <span class="fn">increment_with_gap</span>():
+    <span class="kw">global</span> counter
+    value = counter                 <span class="cm"># read</span>
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">0.1</span>)         <span class="cm"># ⚠️ other tasks can change counter here</span>
+    counter = value + <span class="nb">1</span>             <span class="cm"># write (may overwrite other changes!)</span></code></pre>
+
+<h3>Technique: <code>asyncio.to_thread</code></h3>
+
+<p>Run blocking sync code without freezing the event loop:</p>
+
+<pre><code><span class="kw">def</span> <span class="fn">expensive_computation</span>(n):
+    <span class="kw">return</span> <span class="bi">sum</span>(<span class="bi">range</span>(n))
+
+<span class="kw">async def</span> <span class="fn">main</span>():
+    result = <span class="kw">await</span> asyncio.to_thread(expensive_computation, <span class="nb">10_000_000</span>)
+    <span class="bi">print</span>(result)</code></pre>
+
+<h3>Technique: Timeouts</h3>
+
+<pre><code><span class="kw">async def</span> <span class="fn">fetch_with_timeout</span>():
+    <span class="kw">try</span>:
+        result = <span class="kw">await</span> asyncio.wait_for(slow_api_call(), timeout=<span class="nb">10.0</span>)
+        <span class="kw">return</span> result
+    <span class="kw">except</span> asyncio.TimeoutError:
+        <span class="bi">print</span>(<span class="st">"API call timed out!"</span>)
+        <span class="kw">return</span> <span class="kw">None</span></code></pre>
+
+<h3>Technique: Semaphores for Rate Limiting</h3>
+
+<p>When you have 1000 URLs but the API only allows 10 concurrent requests:</p>
+
+<pre><code><span class="kw">async def</span> <span class="fn">fetch_with_limit</span>(url, client, semaphore):
+    <span class="kw">async with</span> semaphore:  <span class="cm"># only N tasks inside at once</span>
+        response = <span class="kw">await</span> client.get(url)
+        <span class="kw">return</span> response.text
+
+<span class="kw">async def</span> <span class="fn">main</span>():
+    urls = [<span class="st">f"https://api.example.com/</span>{i}<span class="st">"</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">1000</span>)]
+    semaphore = asyncio.Semaphore(<span class="nb">10</span>)
+
+    <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+        results = <span class="kw">await</span> asyncio.gather(
+            *[fetch_with_limit(url, client, semaphore) <span class="kw">for</span> url <span class="kw">in</span> urls]
+        )</code></pre>
+
+<h3>Technique: <code>async for</code> and <code>async with</code></h3>
+
+<pre><code><span class="cm"># async with — resources needing async setup/teardown</span>
+<span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+    response = <span class="kw">await</span> client.get(url)
+
+<span class="cm"># async for — iterating over async generators / streams</span>
+<span class="kw">async def</span> <span class="fn">generate_numbers</span>():
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">10</span>):
+        <span class="kw">await</span> asyncio.sleep(<span class="nb">0.1</span>)
+        <span class="kw">yield</span> i
+
+<span class="kw">async for</span> num <span class="kw">in</span> generate_numbers():
+    <span class="bi">print</span>(num)</code></pre>
+
+<h3>Cheat Sheet: Sync → Async Equivalents</h3>
+
+<div class="ref-card">
+  <div class="ref-card-title">Translation Table</div>
+  <table>
+    <thead><tr><th>Synchronous</th><th>Async Equivalent</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>time.sleep(n)</code></td><td><code>await asyncio.sleep(n)</code></td><td>stdlib</td></tr>
+      <tr><td><code>requests.get(url)</code></td><td><code>await client.get(url)</code></td><td>httpx / aiohttp</td></tr>
+      <tr><td><code>open(f).read()</code></td><td><code>await aiofiles.open(f)</code></td><td>aiofiles package</td></tr>
+      <tr><td><code>for x in items:</code></td><td><code>async for x in aitems:</code></td><td>async iterators</td></tr>
+      <tr><td><code>with ctx:</code></td><td><code>async with ctx:</code></td><td>async context managers</td></tr>
+      <tr><td><code>threading.Lock()</code></td><td><code>asyncio.Lock()</code></td><td>stdlib</td></tr>
+      <tr><td><code>threading.Semaphore(n)</code></td><td><code>asyncio.Semaphore(n)</code></td><td>stdlib</td></tr>
+      <tr><td><code>concurrent.futures</code></td><td><code>asyncio.gather()</code></td><td>stdlib</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ======================================================== -->
+<!-- PART 8 -->
+<!-- ======================================================== -->
+<h2 id="part8"><span class="part-num">Part 8</span>Exercises</h2>
+
+<p>Work through these in a Cursor notebook (<code>.ipynb</code>). Remember: in a notebook, use <code>await</code> directly in cells.</p>
+
+<!-- Exercise 1 -->
+<div class="exercise">
+  <div class="exercise-header">
+    <span class="exercise-num">Exercise 1</span>
+    <span class="exercise-title">Your First Coroutine</span>
+    <span class="exercise-difficulty easy">Warm-up</span>
+  </div>
+  <p>Write an async function <code>slow_add(a, b)</code> that:</p>
+  <ol>
+    <li>Prints <code>"Computing {a} + {b}..."</code></li>
+    <li>Waits for 1 second (simulate slow computation)</li>
+    <li>Returns the sum</li>
+  </ol>
+  <p>Then call it and print the result.</p>
+  <pre><code><span class="cm"># Your code here</span>
+
+result = <span class="kw">await</span> slow_add(<span class="nb">3</span>, <span class="nb">4</span>)
+<span class="bi">print</span>(<span class="st">f"Result: </span>{result}<span class="st">"</span>)  <span class="cm"># Should print: Result: 7</span></code></pre>
+  <details>
+    <summary>💡 Hint</summary>
+    <div class="solution-body"><p>Use <code>async def</code>, <code>await asyncio.sleep(1)</code>, and <code>return a + b</code>.</p></div>
+  </details>
+  <details>
+    <summary>✅ Solution</summary>
+    <div class="solution-body">
+      <pre><code><span class="kw">import</span> asyncio
+
+<span class="kw">async def</span> <span class="fn">slow_add</span>(a: <span class="bi">int</span>, b: <span class="bi">int</span>) -> <span class="bi">int</span>:
+    <span class="bi">print</span>(<span class="st">f"Computing </span>{a}<span class="st"> + </span>{b}<span class="st">..."</span>)
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">1</span>)
+    <span class="kw">return</span> a + b
+
+result = <span class="kw">await</span> slow_add(<span class="nb">3</span>, <span class="nb">4</span>)
+<span class="bi">print</span>(<span class="st">f"Result: </span>{result}<span class="st">"</span>)</code></pre>
+    </div>
+  </details>
+</div>
+
+<!-- Exercise 2 -->
+<div class="exercise">
+  <div class="exercise-header">
+    <span class="exercise-num">Exercise 2</span>
+    <span class="exercise-title">Sequential vs Concurrent Timing</span>
+    <span class="exercise-difficulty easy">Warm-up</span>
+  </div>
+  <p>Write two functions that each call <code>slow_add</code> three times with different args. Time both:</p>
+  <ol>
+    <li><code>sequential_adds()</code> — calls <code>slow_add</code> three times, one after another</li>
+    <li><code>concurrent_adds()</code> — calls <code>slow_add</code> three times concurrently with <code>asyncio.gather</code></li>
+  </ol>
+  <p><strong>Expected:</strong> Sequential ≈ 3.0s, Concurrent ≈ 1.0s</p>
+  <details>
+    <summary>✅ Solution</summary>
+    <div class="solution-body">
+      <pre><code><span class="kw">import</span> asyncio, time
+
+<span class="kw">async def</span> <span class="fn">slow_add</span>(a, b):
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">1</span>)
+    <span class="kw">return</span> a + b
+
+<span class="kw">async def</span> <span class="fn">sequential_adds</span>():
+    r1 = <span class="kw">await</span> slow_add(<span class="nb">1</span>, <span class="nb">2</span>)
+    r2 = <span class="kw">await</span> slow_add(<span class="nb">3</span>, <span class="nb">4</span>)
+    r3 = <span class="kw">await</span> slow_add(<span class="nb">5</span>, <span class="nb">6</span>)
+    <span class="kw">return</span> [r1, r2, r3]
+
+<span class="kw">async def</span> <span class="fn">concurrent_adds</span>():
+    results = <span class="kw">await</span> asyncio.gather(
+        slow_add(<span class="nb">1</span>, <span class="nb">2</span>), slow_add(<span class="nb">3</span>, <span class="nb">4</span>), slow_add(<span class="nb">5</span>, <span class="nb">6</span>),
+    )
+    <span class="kw">return</span> <span class="bi">list</span>(results)
+
+start = time.time()
+<span class="bi">print</span>(<span class="st">"Seq:"</span>, <span class="kw">await</span> sequential_adds(), <span class="st">f"in </span>{time.time()-start:.1f}<span class="st">s"</span>)
+start = time.time()
+<span class="bi">print</span>(<span class="st">"Con:"</span>, <span class="kw">await</span> concurrent_adds(), <span class="st">f"in </span>{time.time()-start:.1f}<span class="st">s"</span>)</code></pre>
+    </div>
+  </details>
+</div>
+
+<!-- Exercise 3 -->
+<div class="exercise">
+  <div class="exercise-header">
+    <span class="exercise-num">Exercise 3</span>
+    <span class="exercise-title">Error Handling with <code>gather</code></span>
+    <span class="exercise-difficulty medium">Medium</span>
+  </div>
+  <p>Write <code>risky_fetch(name, should_fail)</code> that waits 0.5s, then raises <code>ValueError</code> if <code>should_fail</code> is True, otherwise returns a success string.</p>
+  <p>Use <code>asyncio.gather</code> with <code>return_exceptions=True</code> to run three calls where the middle one fails. Print which tasks succeeded and which failed.</p>
+  <details>
+    <summary>✅ Solution</summary>
+    <div class="solution-body">
+      <pre><code><span class="kw">import</span> asyncio
+
+<span class="kw">async def</span> <span class="fn">risky_fetch</span>(name: <span class="bi">str</span>, should_fail: <span class="bi">bool</span>) -> <span class="bi">str</span>:
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">0.5</span>)
+    <span class="kw">if</span> should_fail:
+        <span class="kw">raise</span> <span class="bi">ValueError</span>(<span class="st">f"</span>{name}<span class="st"> failed!"</span>)
+    <span class="kw">return</span> <span class="st">f"</span>{name}<span class="st"> succeeded"</span>
+
+results = <span class="kw">await</span> asyncio.gather(
+    risky_fetch(<span class="st">"Task A"</span>, <span class="kw">False</span>),
+    risky_fetch(<span class="st">"Task B"</span>, <span class="kw">True</span>),
+    risky_fetch(<span class="st">"Task C"</span>, <span class="kw">False</span>),
+    return_exceptions=<span class="kw">True</span>,
+)
+
+<span class="kw">for</span> i, result <span class="kw">in</span> <span class="bi">enumerate</span>(results):
+    <span class="kw">if</span> <span class="bi">isinstance</span>(result, <span class="bi">Exception</span>):
+        <span class="bi">print</span>(<span class="st">f"Task </span>{i}<span class="st">: FAILED - </span>{result}<span class="st">"</span>)
+    <span class="kw">else</span>:
+        <span class="bi">print</span>(<span class="st">f"Task </span>{i}<span class="st">: OK - </span>{result}<span class="st">"</span>)</code></pre>
+    </div>
+  </details>
+</div>
+
+<!-- Exercise 4 -->
+<div class="exercise">
+  <div class="exercise-header">
+    <span class="exercise-num">Exercise 4</span>
+    <span class="exercise-title">Rate-Limited Concurrent Fetches</span>
+    <span class="exercise-difficulty medium">Medium</span>
+  </div>
+  <p>Using <code>asyncio.Semaphore</code>, process 10 tasks concurrently with a maximum of 3 running at once. Each task should print start/finish timestamps and wait a random 0.5–2.0 seconds. Verify from the timestamps that only 3 run simultaneously.</p>
+  <details>
+    <summary>💡 Hint</summary>
+    <div class="solution-body"><p>Create <code>asyncio.Semaphore(3)</code>. Each task uses <code>async with semaphore:</code> before its work.</p></div>
+  </details>
+  <details>
+    <summary>✅ Solution</summary>
+    <div class="solution-body">
+      <pre><code><span class="kw">import</span> asyncio, random, time
+
+start_time = time.time()
+
+<span class="kw">async def</span> <span class="fn">limited_task</span>(task_id, semaphore):
+    <span class="kw">async with</span> semaphore:
+        t = time.time() - start_time
+        <span class="bi">print</span>(<span class="st">f"  [</span>{t:5.1f}<span class="st">s] Task </span>{task_id:2d}<span class="st"> STARTED"</span>)
+        <span class="kw">await</span> asyncio.sleep(random.uniform(<span class="nb">0.5</span>, <span class="nb">2.0</span>))
+        t = time.time() - start_time
+        <span class="bi">print</span>(<span class="st">f"  [</span>{t:5.1f}<span class="st">s] Task </span>{task_id:2d}<span class="st"> DONE"</span>)
+        <span class="kw">return</span> task_id
+
+<span class="kw">async def</span> <span class="fn">process_all</span>():
+    sem = asyncio.Semaphore(<span class="nb">3</span>)
+    <span class="kw">return</span> <span class="kw">await</span> asyncio.gather(
+        *[limited_task(i, sem) <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">10</span>)]
+    )
+
+results = <span class="kw">await</span> process_all()
+<span class="bi">print</span>(<span class="st">f"\nDone! Results: </span>{<span class="bi">sorted</span>(results)}<span class="st">"</span>)</code></pre>
+    </div>
+  </details>
+</div>
+
+<!-- Exercise 5 -->
+<div class="exercise">
+  <div class="exercise-header">
+    <span class="exercise-num">Exercise 5</span>
+    <span class="exercise-title">Async Pipeline</span>
+    <span class="exercise-difficulty medium">Medium</span>
+  </div>
+  <p>Build a three-stage async pipeline:</p>
+  <ol>
+    <li><strong>Fetch:</strong> number → wait 0.5s → return number × 2</li>
+    <li><strong>Transform:</strong> number → wait 0.3s → return number + 10</li>
+    <li><strong>Format:</strong> number → wait 0.2s → return <code>"Result: {n}"</code></li>
+  </ol>
+  <p>Write <code>pipeline(n)</code> that chains all three stages. Then use <code>gather</code> to run 5 pipelines concurrently. Total should be ~1.0s, not ~5.0s.</p>
+  <details>
+    <summary>✅ Solution</summary>
+    <div class="solution-body">
+      <pre><code><span class="kw">import</span> asyncio, time
+
+<span class="kw">async def</span> <span class="fn">fetch</span>(n):
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">0.5</span>); <span class="kw">return</span> n * <span class="nb">2</span>
+
+<span class="kw">async def</span> <span class="fn">transform</span>(n):
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">0.3</span>); <span class="kw">return</span> n + <span class="nb">10</span>
+
+<span class="kw">async def</span> <span class="fn">format_result</span>(n):
+    <span class="kw">await</span> asyncio.sleep(<span class="nb">0.2</span>); <span class="kw">return</span> <span class="st">f"Result: </span>{n}<span class="st">"</span>
+
+<span class="kw">async def</span> <span class="fn">pipeline</span>(n):
+    fetched = <span class="kw">await</span> fetch(n)
+    transformed = <span class="kw">await</span> transform(fetched)
+    <span class="kw">return</span> <span class="kw">await</span> format_result(transformed)
+
+start = time.time()
+results = <span class="kw">await</span> asyncio.gather(*[pipeline(n) <span class="kw">for</span> n <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">1</span>, <span class="nb">6</span>)])
+<span class="bi">print</span>(<span class="st">f"Results: </span>{results}<span class="st">"</span>)
+<span class="bi">print</span>(<span class="st">f"Time: </span>{time.time()-start:.1f}<span class="st">s"</span>)
+<span class="cm"># ['Result: 12', 'Result: 14', ..., 'Result: 20'] in ~1.0s</span></code></pre>
+    </div>
+  </details>
+</div>
+
+<!-- Exercise 6 -->
+<div class="exercise">
+  <div class="exercise-header">
+    <span class="exercise-num">Exercise 6</span>
+    <span class="exercise-title">Async Gradio App</span>
+    <span class="exercise-difficulty medium">Medium</span>
+  </div>
+  <p>Create a <code>.py</code> file with a Gradio interface: text input for a search query, three output boxes. The async callback uses <code>asyncio.gather</code> to "search" three sources concurrently (simulated with random delays). Display elapsed time.</p>
+  <details>
+    <summary>✅ Solution</summary>
+    <div class="solution-body">
+      <pre><code><span class="cm"># search_app.py</span>
+<span class="kw">import</span> asyncio, random, time
+<span class="kw">import</span> gradio <span class="kw">as</span> gr
+
+<span class="kw">async def</span> <span class="fn">search_source</span>(source, query):
+    delay = random.uniform(<span class="nb">0.5</span>, <span class="nb">2.0</span>)
+    <span class="kw">await</span> asyncio.sleep(delay)
+    <span class="kw">return</span> <span class="st">f"</span>{source}<span class="st"> for '</span>{query}<span class="st">': [data] (</span>{delay:.1f}<span class="st">s)"</span>
+
+<span class="kw">async def</span> <span class="fn">search_all</span>(query):
+    start = time.time()
+    results = <span class="kw">await</span> asyncio.gather(
+        search_source(<span class="st">"Source A"</span>, query),
+        search_source(<span class="st">"Source B"</span>, query),
+        search_source(<span class="st">"Source C"</span>, query),
+    )
+    t = time.time() - start
+    <span class="kw">return</span> <span class="bi">tuple</span>(<span class="st">f"</span>{r}<span class="st">\nWall time: </span>{t:.1f}<span class="st">s"</span> <span class="kw">for</span> r <span class="kw">in</span> results)
+
+demo = gr.Interface(
+    fn=search_all,
+    inputs=gr.Textbox(label=<span class="st">"Query"</span>),
+    outputs=[gr.Textbox(label=s) <span class="kw">for</span> s <span class="kw">in</span> [<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>]],
+)
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    demo.launch()
+<span class="cm"># Run: uv run python search_app.py</span></code></pre>
+    </div>
+  </details>
+</div>
+
+<!-- Exercise 7 -->
+<div class="exercise">
+  <div class="exercise-header">
+    <span class="exercise-num">Exercise 7</span>
+    <span class="exercise-title">Async Retry with Exponential Backoff</span>
+    <span class="exercise-difficulty hard">Challenge</span>
+  </div>
+  <p>Write an <code>async_retry(max_retries=3)</code> decorator that retries a failed async function with exponential backoff (<code>2 ** attempt</code> seconds between retries), logs each attempt, and re-raises if all retries fail.</p>
+  <pre><code><span class="kw">@async_retry</span>(max_retries=<span class="nb">3</span>)
+<span class="kw">async def</span> <span class="fn">flaky_api_call</span>(name: <span class="bi">str</span>) -> <span class="bi">str</span>:
+    <span class="kw">if</span> random.random() < <span class="nb">0.6</span>:
+        <span class="kw">raise</span> <span class="bi">ConnectionError</span>(<span class="st">f"Failed to reach </span>{name}<span class="st">"</span>)
+    <span class="kw">return</span> <span class="st">f"Success from </span>{name}<span class="st">!"</span></code></pre>
+  <details>
+    <summary>💡 Hint</summary>
+    <div class="solution-body"><p>Use <code>functools.wraps</code>. Inside the wrapper: <code>for attempt in range(max_retries + 1)</code> with <code>try/except</code>. On failure: <code>await asyncio.sleep(2 ** attempt)</code>.</p></div>
+  </details>
+  <details>
+    <summary>✅ Solution</summary>
+    <div class="solution-body">
+      <pre><code><span class="kw">import</span> asyncio, functools, random
+
+<span class="kw">def</span> <span class="fn">async_retry</span>(max_retries=<span class="nb">3</span>):
+    <span class="kw">def</span> <span class="fn">decorator</span>(func):
+        <span class="kw">@functools.wraps</span>(func)
+        <span class="kw">async def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+            last_exc = <span class="kw">None</span>
+            <span class="kw">for</span> attempt <span class="kw">in</span> <span class="bi">range</span>(max_retries + <span class="nb">1</span>):
+                <span class="kw">try</span>:
+                    <span class="kw">return</span> <span class="kw">await</span> func(*args, **kwargs)
+                <span class="kw">except</span> <span class="bi">Exception</span> <span class="kw">as</span> e:
+                    last_exc = e
+                    <span class="kw">if</span> attempt < max_retries:
+                        wait = <span class="nb">2</span> ** attempt
+                        <span class="bi">print</span>(<span class="st">f"  Attempt </span>{attempt+1}<span class="st"> failed: </span>{e}<span class="st">. Retry in </span>{wait}<span class="st">s"</span>)
+                        <span class="kw">await</span> asyncio.sleep(wait)
+                    <span class="kw">else</span>:
+                        <span class="bi">print</span>(<span class="st">f"  Attempt </span>{attempt+1}<span class="st"> failed. No retries left."</span>)
+            <span class="kw">raise</span> last_exc
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+<span class="kw">@async_retry</span>(max_retries=<span class="nb">3</span>)
+<span class="kw">async def</span> <span class="fn">flaky_api_call</span>(name):
+    <span class="kw">if</span> random.random() < <span class="nb">0.6</span>:
+        <span class="kw">raise</span> <span class="bi">ConnectionError</span>(<span class="st">f"Failed: </span>{name}<span class="st">"</span>)
+    <span class="kw">return</span> <span class="st">f"Success from </span>{name}<span class="st">!"</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">3</span>):
+    <span class="kw">try</span>:
+        <span class="bi">print</span>(<span class="kw">await</span> flaky_api_call(<span class="st">"TestAPI"</span>))
+    <span class="kw">except</span>: <span class="bi">print</span>(<span class="st">"Gave up"</span>)</code></pre>
+    </div>
+  </details>
+</div>
+
+<!-- Exercise 8 -->
+<div class="exercise">
+  <div class="exercise-header">
+    <span class="exercise-num">Exercise 8</span>
+    <span class="exercise-title">Producer-Consumer with <code>asyncio.Queue</code></span>
+    <span class="exercise-difficulty hard">Challenge</span>
+  </div>
+  <p>Build an async producer-consumer system:</p>
+  <ul>
+    <li><strong>Producer:</strong> generates 20 work items (numbered 1–20) at random intervals (0.1–0.5s)</li>
+    <li><strong>3 Consumers:</strong> each takes items from a shared <code>asyncio.Queue</code>, "processes" them (0.5–1.5s), prints progress</li>
+    <li>Graceful shutdown when all items are produced and consumed</li>
+  </ul>
+  <details>
+    <summary>💡 Hint</summary>
+    <div class="solution-body"><p>Use <code>asyncio.Queue()</code>. Producer puts items with <code>await queue.put(item)</code>. Consumers get items in a loop with <code>await queue.get()</code>. Use <code>None</code> sentinel values (one per consumer) to signal shutdown.</p></div>
+  </details>
+  <details>
+    <summary>✅ Solution</summary>
+    <div class="solution-body">
+      <pre><code><span class="kw">import</span> asyncio, random, time
+start_time = time.time()
+
+<span class="kw">async def</span> <span class="fn">producer</span>(queue, n_items, n_consumers):
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">1</span>, n_items + <span class="nb">1</span>):
+        <span class="kw">await</span> asyncio.sleep(random.uniform(<span class="nb">0.1</span>, <span class="nb">0.5</span>))
+        <span class="bi">print</span>(<span class="st">f"  [</span>{time.time()-start_time:5.1f}<span class="st">s] 📦 Produced </span>{i}<span class="st">"</span>)
+        <span class="kw">await</span> queue.put(i)
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="bi">range</span>(n_consumers):
+        <span class="kw">await</span> queue.put(<span class="kw">None</span>)  <span class="cm"># poison pills</span>
+
+<span class="kw">async def</span> <span class="fn">consumer</span>(name, queue):
+    <span class="kw">while</span> <span class="kw">True</span>:
+        item = <span class="kw">await</span> queue.get()
+        <span class="kw">if</span> item <span class="kw">is</span> <span class="kw">None</span>: <span class="kw">break</span>
+        <span class="bi">print</span>(<span class="st">f"  [</span>{time.time()-start_time:5.1f}<span class="st">s] ⚙️  </span>{name}<span class="st"> processing </span>{item}<span class="st">"</span>)
+        <span class="kw">await</span> asyncio.sleep(random.uniform(<span class="nb">0.5</span>, <span class="nb">1.5</span>))
+        <span class="bi">print</span>(<span class="st">f"  [</span>{time.time()-start_time:5.1f}<span class="st">s] ✅ </span>{name}<span class="st"> done with </span>{item}<span class="st">"</span>)
+
+<span class="kw">async def</span> <span class="fn">run_pipeline</span>():
+    queue = asyncio.Queue(maxsize=<span class="nb">5</span>)
+    <span class="kw">await</span> asyncio.gather(
+        producer(queue, <span class="nb">20</span>, <span class="nb">3</span>),
+        consumer(<span class="st">"Worker-A"</span>, queue),
+        consumer(<span class="st">"Worker-B"</span>, queue),
+        consumer(<span class="st">"Worker-C"</span>, queue),
+    )
+    <span class="bi">print</span>(<span class="st">f"\n  Done in </span>{time.time()-start_time:.1f}<span class="st">s"</span>)
+
+<span class="kw">await</span> run_pipeline()</code></pre>
+    </div>
+  </details>
+</div>
+
+<hr>
+
+<h3>What's Next?</h3>
+
+<p>Once you're comfortable with these exercises, you're ready to use async in real projects:</p>
+
+<ul>
+  <li><strong>LLM API calls</strong> with <code>httpx.AsyncClient</code> or the <code>openai</code> / <code>anthropic</code> SDKs (<code>AsyncOpenAI</code>, <code>AsyncAnthropic</code>)</li>
+  <li><strong>Gradio apps</strong> with async callbacks for responsive UIs</li>
+  <li><strong>Data pipelines</strong> that fetch, process, and store data concurrently</li>
+  <li><strong>Web scraping</strong> with <code>httpx</code> or Playwright's <code>async_api</code></li>
+</ul>
+
+<div class="callout tip">
+  <div class="callout-title">The Key Insight</div>
+  <p><strong>Async isn't about making things faster — it's about not wasting time waiting.</strong> When your code is I/O-bound (which most LLM and API work is), async can dramatically improve throughput with very little additional complexity.</p>
+</div>
+
+<p style="color: var(--text-muted); margin-top: 48px; font-size: 13px; text-align: center;">
+  Tutorial v1.0 — Built for students working with Python notebooks and modules in Cursor, using uv for package management.
+</p>
+
+</main>
+</div>
+</body>
+</html>
