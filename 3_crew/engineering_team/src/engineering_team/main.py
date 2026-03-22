@@ -9,7 +9,7 @@ from engineering_team.crew import EngineeringTeam
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 # Create output directory if it doesn't exist
-os.makedirs('output', exist_ok=True)
+os.makedirs('project', exist_ok=True)
 
 requirements = """
 A simple account management system for a trading simulation platform.

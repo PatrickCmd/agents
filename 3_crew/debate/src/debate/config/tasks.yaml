@@ -5,7 +5,7 @@ propose:
     Be very convincing.
   expected_output: >
     Your clear argument in favor of the motion, in a concise manner.
-  agent: debater
+  agent: debater_proposer
   output_file: output/propose.md
 
 oppose:
@@ -15,8 +15,9 @@ oppose:
     Be very convincing.
   expected_output: >
     Your clear argument against the motion, in a concise manner.
-  agent: debater
+  agent: debater_opposer
   output_file: output/oppose.md
+  
 decide:
   description: >
     Review the arguments presented by the debaters and decide which side is more convincing.

@@ -7,7 +7,7 @@ design_task:
   expected_output: >
     A detailed design for the engineer, identifying the classes and functions in the module.
   agent: engineering_lead
-  output_file: output/{module_name}_design.md
+  output_file: project/{module_name}_design.md
 
 code_task:
   description: >
@@ -20,7 +20,7 @@ code_task:
   agent: backend_engineer
   context:
     - design_task
-  output_file: output/{module_name}
+  output_file: project/{module_name}
 
 frontend_task:
   description: >
@@ -35,7 +35,7 @@ frontend_task:
   agent: frontend_engineer
   context:
     - code_task
-  output_file: output/app.py
+  output_file: project/app.py
 
 test_task:
   description: >
@@ -47,4 +47,4 @@ test_task:
   agent: test_engineer
   context:
     - code_task
-  output_file: output/test_{module_name}
+  output_file: project/test_{module_name}

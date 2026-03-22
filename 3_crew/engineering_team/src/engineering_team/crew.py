@@ -25,7 +25,7 @@ class EngineeringTeam():
             allow_code_execution=True,
             code_execution_mode="safe",  # Uses Docker for safety
             max_execution_time=500, 
-            max_retry_limit=3 
+            max_retry_limit=5 
         )
     
     @agent
@@ -43,7 +43,7 @@ class EngineeringTeam():
             allow_code_execution=True,
             code_execution_mode="safe",  # Uses Docker for safety
             max_execution_time=500, 
-            max_retry_limit=3 
+            max_retry_limit=5 
         )
 
     @task

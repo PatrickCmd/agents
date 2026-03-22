@@ -1,1 +1,29 @@
-{"companies":[{"name":"LumeCube","ticker":"N/A","reason":"A leader in manufacturing portable lighting solutions for photography, videography, and live streaming."},{"name":"Epic MegaGrants","ticker":"N/A","reason":"A program by Epic Games that funds developers and creators to encourage innovation within the industry."},{"name":"Synapse","ticker":"N/A","reason":"Offering advanced AI solutions to automate business processes and enhance collaboration."},{"name":"Boom Supersonic","ticker":"N/A","reason":"Pioneering the return of supersonic flights with their Overture aircraft designed to be sustainable."},{"name":"Figma","ticker":"N/A","reason":"A platform for interface design that has increased its popularity significantly, promoting collaborative design work."},{"name":"Notion","ticker":"N/A","reason":"A workspace tool that combines notes, tasks, and databases, gaining traction for its versatility."},{"name":"Fivetran","ticker":"N/A","reason":"A data integration platform that automates the data pipeline process, enhancing data accessibility for businesses."},{"name":"Zapier","ticker":"N/A","reason":"Enabling automation of workflows by connecting various apps, simplifying task processes for users."},{"name":"Gusto","ticker":"N/A","reason":"Providing modern solutions for payroll and HR management targeted at small businesses."},{"name":"Calendly","ticker":"N/A","reason":"Simplifying appointment scheduling by allowing users to share available times effectively."}]}
+{
+    "companies": [
+        {
+            "name": "Ambience Healthcare",
+            "ticker": "Private",
+            "reason": "Rapid growth in 2026 via recent funding; innovative ambient sensing tech for hybrid in-home care combining passive monitoring with traditional clinical services, gaining market traction."
+        },
+        {
+            "name": "Tennr",
+            "ticker": "Private",
+            "reason": "Emerging telehealth platform oriented on personalized behavioral health and chronic disease management with recent funding and partnerships scaling hybrid digital healthcare."
+        },
+        {
+            "name": "Vivodyne",
+            "ticker": "Private",
+            "reason": "Trending for novel wearable biosensor development enabling real-time physiological monitoring; recent investment advances flexible continuous health tracking tech disrupting traditional care."
+        },
+        {
+            "name": "Abridge",
+            "ticker": "Private",
+            "reason": "AI-powered clinical note-taking and patient conversation summarization startup securing new funding and streamlining healthcare provider workflows, improving documentation and communication."
+        },
+        {
+            "name": "Mammoth Biosciences",
+            "ticker": "Private",
+            "reason": "Advancing CRISPR-based diagnostic technologies with broad testing applications and $263M+ raised, positioning as a transformative player in biotech diagnostics in 2026."
+        }
+    ]
+}
