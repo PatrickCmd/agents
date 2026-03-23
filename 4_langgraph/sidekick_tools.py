@@ -20,7 +20,12 @@ serper = GoogleSerperAPIWrapper()
 
 async def playwright_tools():
     playwright = await async_playwright().start()
-    browser = await playwright.chromium.launch(headless=False)
+    browser = await playwright.chromium.launch(headless=True) # False For headful mode, True for headless mode
+
+    # Set a 300-second navigation timeout on the default context
+    context = browser.contexts[0] if browser.contexts else await browser.new_context()
+    context.set_default_navigation_timeout(300000)  # 300 seconds
+
     toolkit = PlayWrightBrowserToolkit.from_browser(async_browser=browser)
     return toolkit.get_tools(), browser, playwright
 
