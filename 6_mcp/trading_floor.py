@@ -22,10 +22,10 @@ if USE_MANY_MODELS:
     model_names = [
         "gpt-4.1-mini",
         "deepseek-chat",
-        "gemini-2.5-flash-preview-04-17",
-        "grok-3-mini-beta",
+        "gemini-2.5-flash",
+        "openai/gpt-oss-20b",
     ]
-    short_model_names = ["GPT 4.1 Mini", "DeepSeek V3", "Gemini 2.5 Flash", "Grok 3 Mini"]
+    short_model_names = ["GPT 4.1 Mini", "DeepSeek V3", "Gemini 3 Flash", "GPT OSS 20B"]
 else:
     model_names = ["gpt-4o-mini"] * 4
     short_model_names = ["GPT 4o mini"] * 4
