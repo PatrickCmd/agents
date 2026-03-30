@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from langgraph.prebuilt import ToolNode
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+from langgraph.checkpoint.memory import MemoryServer
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from typing import List, Any, Optional, Dict
 from pydantic import BaseModel, Field
@@ -51,7 +52,7 @@ class Sidekick:
         self.llm_with_tools = None
         self.graph = None
         self.sidekick_id = str(uuid.uuid4())
-        self.memory = None
+        self.memory = None # MemoryServer() Use MemorySaver for in-memory storage
         self._memory_ctx = None
         self.browser = None
         self.playwright = None
