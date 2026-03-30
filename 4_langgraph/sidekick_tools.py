@@ -3,7 +3,7 @@ from langchain_community.agent_toolkits import PlayWrightBrowserToolkit
 from dotenv import load_dotenv
 import os
 import requests
-from langchain.agents import Tool
+from langchain_core.tools import Tool
 from langchain_community.agent_toolkits import FileManagementToolkit
 from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
 from langchain_experimental.tools import PythonREPLTool
@@ -20,7 +20,7 @@ serper = GoogleSerperAPIWrapper()
 
 async def playwright_tools():
     playwright = await async_playwright().start()
-    browser = await playwright.chromium.launch(headless=True) # False For headful mode, True for headless mode
+    browser = await playwright.chromium.launch(headless=False) # False For headful mode, True for headless mode
 
     # Set a 300-second navigation timeout on the default context
     context = browser.contexts[0] if browser.contexts else await browser.new_context()

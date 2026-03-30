@@ -5,7 +5,7 @@ from langgraph.graph.message import add_messages
 from dotenv import load_dotenv
 from langgraph.prebuilt import ToolNode
 from langchain_openai import ChatOpenAI
-from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from typing import List, Any, Optional, Dict
 from pydantic import BaseModel, Field
@@ -33,6 +33,16 @@ class EvaluatorOutput(BaseModel):
     )
 
 
+class ClarifyingQuestions(BaseModel):
+    question_1: str = Field(description="First clarifying question")
+    question_2: str = Field(description="Second clarifying question")
+    question_3: str = Field(description="Third clarifying question")
+
+
+class RefinedPrompt(BaseModel):
+    refined_prompt: str = Field(description="The refined and improved user prompt")
+
+
 class Sidekick:
     def __init__(self):
         self.worker_llm_with_tools = None
@@ -41,17 +51,24 @@ class Sidekick:
         self.llm_with_tools = None
         self.graph = None
         self.sidekick_id = str(uuid.uuid4())
-        self.memory = MemorySaver()
+        self.memory = None
+        self._memory_ctx = None
         self.browser = None
         self.playwright = None
 
     async def setup(self):
+        self._memory_ctx = AsyncSqliteSaver.from_conn_string("sidekick.db")
+        self.memory = await self._memory_ctx.__aenter__()
         self.tools, self.browser, self.playwright = await playwright_tools()
         self.tools += await other_tools()
         worker_llm = ChatOpenAI(model="gpt-4.1-mini")
         self.worker_llm_with_tools = worker_llm.bind_tools(self.tools)
         evaluator_llm = ChatOpenAI(model="gpt-4.1-mini")
         self.evaluator_llm_with_output = evaluator_llm.with_structured_output(EvaluatorOutput)
+        clarifier_llm = ChatOpenAI(model="gpt-4.1-mini")
+        self.clarifier_llm = clarifier_llm.with_structured_output(ClarifyingQuestions)
+        refiner_llm = ChatOpenAI(model="gpt-4.1-mini")
+        self.refiner_llm = refiner_llm.with_structured_output(RefinedPrompt)
         await self.build_graph()
 
     def worker(self, state: State) -> Dict[str, Any]:
@@ -208,7 +225,46 @@ class Sidekick:
         feedback = {"role": "assistant", "content": result["messages"][-1].content}
         return history + [user, reply, feedback]
 
+    def generate_clarifying_questions(self, message: str) -> ClarifyingQuestions:
+        system = (
+            "You are a helpful assistant. Given a user's task request, generate exactly 3 "
+            "short, specific clarifying questions that would help you better understand and "
+            "complete the task. Focus on ambiguities, scope, preferences, or constraints."
+        )
+        messages = [
+            SystemMessage(content=system),
+            HumanMessage(content=f"User request: {message}"),
+        ]
+        return self.clarifier_llm.invoke(messages)
+
+    def refine_prompt(self, original_message: str, questions: list[str], answers: list[str]) -> str:
+        questions_text = "\n".join(f"Q{i}: {q}" for i, q in enumerate(questions, 1))
+        answers_text = "\n".join(answers)
+        system = (
+            "You are a prompt refinement assistant. Given the user's original request, "
+            "the clarifying questions that were asked, and the user's answers, produce a "
+            "single refined prompt that incorporates all the additional context. "
+            "Keep it concise but comprehensive."
+        )
+        user_msg = (
+            f"Original request: {original_message}\n\n"
+            f"Clarifying questions:\n{questions_text}\n\n"
+            f"User's answers:\n{answers_text}"
+        )
+        messages = [
+            SystemMessage(content=system),
+            HumanMessage(content=user_msg),
+        ]
+        result = self.refiner_llm.invoke(messages)
+        return result.refined_prompt
+
     def cleanup(self):
+        if self._memory_ctx:
+            try:
+                loop = asyncio.get_running_loop()
+                loop.create_task(self._memory_ctx.__aexit__(None, None, None))
+            except RuntimeError:
+                asyncio.run(self._memory_ctx.__aexit__(None, None, None))
         if self.browser:
             try:
                 loop = asyncio.get_running_loop()
